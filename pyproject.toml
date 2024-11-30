@@ -1,0 +1,13 @@
+[project]
+name = "hanzo-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.1.0",
+    "pymongo>=4.10.1",
+    "addict>=2.4.0",
+    "flask-jwt-extended>=4.7.1",
+    "gevent>=24.11.1",
+]

@@ -1,0 +1,3 @@
+@echo off
+echo Initializing database...
+uv run -m flask --app flaskr init-db
