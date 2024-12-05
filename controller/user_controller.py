@@ -10,7 +10,6 @@ class UserController(SecureBaseController):
         super().__init__(User)
 
         @self.bp.route("/info/<string:username>", methods=["GET"])
-        @jwt_required()
-        @role_required('admin')
+        @jwt_required()        
         def get_info(username):
             return json_util.dumps(self._class.find_by({'username': username}))

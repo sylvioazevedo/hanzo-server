@@ -21,6 +21,28 @@ class SecureBaseController():
         def list():
             return json_util.dumps(self._class.list())
         
+        # find all by query, sort, order, limit, skip, projection and GET method
+        @self.bp.route("/find", methods=["GET"])
+        @jwt_required()
+        @role_required('admin')
+        def find_all_by():
+            query = Dict(request.args)
+            sort = query.pop('sort', None)
+            order = query.pop('order', None)
+            limit = query.pop('max', None)
+            limit = int(limit) if limit else None
+            skip = query.pop('page', None)
+            skip = int(skip) if skip else None
+            projection = query.pop('projection', None)
+            
+            return json_util.dumps(self._class.find_all_by(query, sort, order, limit, skip, projection))
+        
+        @self.bp.route("/count", methods=["GET"])
+        @jwt_required()
+        def count():
+            query = Dict(request.args)            
+            return json_util.dumps(self._class.count(query))        
+        
         @self.bp.route("/<id>", methods=["GET"])
         @jwt_required()
         @role_required('admin')
@@ -48,7 +70,7 @@ class SecureBaseController():
             data = request.get_json()
             
             if not data:
-                return "No data received", 400         
+                return "No data received", 400                     
             
             return json_util.dumps(self._class(data).save())
         
@@ -66,10 +88,7 @@ class SecureBaseController():
             
             obj = self._class.find_by_id(data._id)
             
-            del(data['_id'])
-                        
-            if 'password' in data:
-                data.password = obj._set_password(data.password)
+            del(data['_id'])                        
                 
             r = obj.update(data)
                              

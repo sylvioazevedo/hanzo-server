@@ -48,10 +48,21 @@ class MongoEntity(Dict):
         
         return cls(_doc)
     
-    @staticmethod
-    def find_all_by(prop, value):
-        return [MongoEntity._class(i) for i in MongoEntity.get_collection().find({prop: value})]
+    @classmethod
+    def find_all_by(cls, _query, sort=None, order=None, limit=None, skip=None, projection=None):   
+
+        # todo: change skip limit to sequence number find limit to improve performance. 
+
+        if sort:
+            _sort = [(sort, int(order))]
+            return [cls(i) for i in cls.get_collection().find(_query, projection, skip=limit*(skip-1), limit=limit).sort(_sort)]
+        else:
+            _sort = None        
+            return [cls(i) for i in cls.get_collection().find(_query, projection, skip=limit*(skip-1), limit=limit)]
     
+    @classmethod
+    def count(cls, _query):
+        return cls.get_collection().estimated_document_count(_query)
     
     # instance methods
     #    
@@ -65,6 +76,11 @@ class MongoEntity(Dict):
         
         if 'last_updated' in self:
             self.last_updated = dt.now()
+
+        if 'password' in data and data.password:
+            data.password = self._set_password(data.password)
+        else:
+            del(data['password'])
         
         return self.get_collection().update_one({"_id": ObjectId(self._id)}, {'$set': data})    
     
@@ -74,7 +90,10 @@ class MongoEntity(Dict):
             self.date_created = dt.now()
             
         if 'last_updated' in self.keys():
-            self.last_updated = dt.now()        
+            self.last_updated = dt.now()
+
+        if 'password' in self.keys():
+            self.password = self._set_password(self.password)
         
         _o = self.get_collection().insert_one(self)
         self._id = _o.inserted_id
@@ -86,8 +105,5 @@ class MongoEntity(Dict):
         
     
     def _set_password(self, password):        
-        
-        self.password = generate_password_hash(password)
-        
-        return self.password
+        return generate_password_hash(password)
     
