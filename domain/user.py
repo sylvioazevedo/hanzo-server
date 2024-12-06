@@ -24,5 +24,5 @@ class User(MongoEntity):
         super().__init__(self, *args, **kwargs)
                 
     def to_string(self):
-        return f"{self.full_name} <{self.username}>"
+        return f"{self.name} <{self.username}>"
         
