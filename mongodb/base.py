@@ -1,17 +1,20 @@
 
-from addict import Dict
 from bson.objectid import ObjectId
 from datetime import datetime as dt
 from mongodb.connection import get_db
 from werkzeug.security import generate_password_hash
 
-class MongoEntity(Dict):
+class MongoEntity():
     
     _db = None
     
     def __init__(self, *args, **kwargs):
         
         for dictionary in args:
+            
+            if not isinstance(dictionary, dict):
+                continue
+            
             for key in dictionary:
                 setattr(self, key, dictionary[key])
         
@@ -74,7 +77,7 @@ class MongoEntity(Dict):
     
     def update(self, data):
         
-        if 'last_updated' in self:
+        if hasattr(self, 'last_updated'):
             self.last_updated = dt.now()
 
         if 'password' in data and data.password:
@@ -86,23 +89,22 @@ class MongoEntity(Dict):
     
     def save(self):
         
-        if 'date_created' in self.keys():
+        if hasattr(self, 'date_created'):
             self.date_created = dt.now()
             
-        if 'last_updated' in self.keys():
+        if hasattr(self, 'last_updated'):
             self.last_updated = dt.now()
 
-        if 'password' in self.keys():
+        if 'password' in self.__dict__:
             self.password = self._set_password(self.password)
         
-        _o = self.get_collection().insert_one(self)
+        _o = self.get_collection().insert_one(self.__dict__)    
         self._id = _o.inserted_id
         
         return {"id": str(self._id)}
         
     def delete(self):
-        r = self.get_collection().delete_one({"_id": ObjectId(self._id)})
-        
+        r = self.get_collection().delete_one({"_id": ObjectId(self._id)})        
     
     def _set_password(self, password):        
         return generate_password_hash(password)

@@ -19,7 +19,7 @@ class SecureBaseController():
         @jwt_required()
         @role_required('admin')
         def list():
-            return json_util.dumps(self._class.list())
+            return json_util.dumps([o.__dict__ for o in self._class.list()])
         
         # find all by query, sort, order, limit, skip, projection and GET method
         @self.bp.route("/find", methods=["GET"])
@@ -35,7 +35,7 @@ class SecureBaseController():
             skip = int(skip) if skip else None
             projection = query.pop('projection', None)
             
-            return json_util.dumps(self._class.find_all_by(query, sort, order, limit, skip, projection))
+            return json_util.dumps([o.__dict__ for o in self._class.find_all_by(query, sort, order, limit, skip, projection)])
         
         @self.bp.route("/count", methods=["GET"])
         @jwt_required()
@@ -47,7 +47,7 @@ class SecureBaseController():
         @jwt_required()
         @role_required('admin')
         def get(id):
-            return json_util.dumps(self._class.find_by_id(id))
+            return json_util.dumps(self._class.find_by_id(id).__dict__)
         
         @self.bp.route("/<id>", methods=["DELETE"])
         @jwt_required()

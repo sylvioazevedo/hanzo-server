@@ -1,29 +1,27 @@
+from dataclasses import dataclass
 from datetime import datetime as dt
 from mongodb.base import MongoEntity
-from addict import Dict
 
-import hashlib
-
+@dataclass
 class User(MongoEntity):
+
+    date_created: dt = None
+    last_updated: dt = None
+    expiration_date: dt = None
+        
+    username: str = None
+    password: str = None
+    name: str = None
+    email: str = None
+    role: str = None
     
-    def __init__(self, *args, **kwargs):      
-                
-        self.date_created: dt = None
-        self.last_updated: dt = None
-        self.expiration_date: dt = None
+    authorizations = []
         
-        self.username: str
-        self.password: str
-        self.name: str
-        self.email: str
-        self.role: str
-    
-        self.authorizations = []
-        
-        self.enabled: bool = True
-        self.expired: bool = False    
-        
-        super().__init__(*args, **kwargs) 
+    enabled: bool = True
+    expired: bool = False
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
                 
     def to_string(self):
         return f"{self.full_name} <{self.username}>"

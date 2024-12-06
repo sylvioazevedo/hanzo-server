@@ -25,17 +25,17 @@ def login():
     if not user:
         return jsonify({'msg': 'User not found'}), 404
     
-    if not check_password_hash(user['password'], data['password']):
+    if not check_password_hash(user.password, data['password']):
         return jsonify({'msg': 'Invalid password'}), 401
     
     claims = {
-        'username': user['username'],
-        'name': user['name'],	
-        'role': user['role']
+        'username': user.username,
+        'name': user.name,	
+        'role': user.role
     }
     
-    access_token = create_access_token(identity=user['username'], additional_claims=claims)
-    refresh_token = create_refresh_token(identity=user['username'])
+    access_token = create_access_token(identity=user.username, additional_claims=claims)
+    refresh_token = create_refresh_token(identity=user.username)
     
     return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 200
 
@@ -52,9 +52,9 @@ def refresh():
         return jsonify({'msg': 'User not found. Unable to refresh access'}), 404
 
     claims = {
-        'username': user['username'],
-        'name': user['name'],	
-        'role': user['role']
+        'username': user.username,
+        'name': user.name,	
+        'role': user.role
     }
     
     access_token = create_access_token(identity=username, additional_claims=claims)
