@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime as dt
 from mongodb.base import MongoEntity
 
@@ -13,7 +13,7 @@ class User(MongoEntity):
     password: str = None
     name: str = None
     email: str = None
-    role: str = None
+    role: str = field(default=None, metadata='list: ["admin", "user"]')	
     
     authorizations = []
         

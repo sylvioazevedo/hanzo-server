@@ -58,7 +58,7 @@ def refresh():
     }
     
     access_token = create_access_token(identity=username, additional_claims=claims)
-    refresh_token = create_refresh_token(identity=user['username'])
+    refresh_token = create_refresh_token(identity=user.username)
     
     return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 200
 
